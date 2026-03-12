@@ -107,7 +107,7 @@ async def lifespan(app: FastAPI):
 
     # Create and start the APScheduler
     try:
-        scheduler = create_scheduler()
+        scheduler = create_scheduler(embed_model=getattr(app.state, "embed_model", None))
         scheduler.start()
         app.state.scheduler = scheduler
         await log.ainfo("scheduler_started")

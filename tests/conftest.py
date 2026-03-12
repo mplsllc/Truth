@@ -76,15 +76,28 @@ async def test_engine():
 
 @pytest.fixture
 async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
-    """Provide a transactional database session for each test."""
-    session_factory = async_sessionmaker(
-        test_engine,
-        expire_on_commit=False,
-    )
+    """Provide a transactional database session for each test.
 
-    async with session_factory() as session:
+    Uses a connection-level transaction that wraps the entire test,
+    then rolls back after the test completes. This ensures that even
+    session.commit() calls inside tested code are undone, providing
+    proper test isolation.
+    """
+    async with test_engine.connect() as connection:
+        # Start a transaction that wraps the entire test
+        transaction = await connection.begin()
+
+        session = AsyncSession(
+            bind=connection,
+            expire_on_commit=False,
+            join_transaction_mode="create_savepoint",
+        )
+
         yield session
-        await session.rollback()
+
+        await session.close()
+        # Rollback the outer transaction, undoing everything including commits
+        await transaction.rollback()
 
 
 @pytest.fixture

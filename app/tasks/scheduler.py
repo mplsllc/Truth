@@ -1,4 +1,4 @@
-"""APScheduler setup with feed polling job."""
+"""APScheduler setup with ingestion pipeline job."""
 
 from __future__ import annotations
 
@@ -9,18 +9,21 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from app.config import get_settings
 from app.db.session import async_session_factory
-from app.models.article import Article
-from app.services.feed_poller import poll_all_feeds, ArticleCandidate
 from app.services.http_client import get_http_client
+from app.services.pipeline import run_ingestion_cycle
 
 logger = structlog.get_logger()
 
 
-async def _run_feed_poll() -> None:
-    """Execute a full feed polling cycle.
+async def _run_ingestion_pipeline(embed_model=None) -> None:
+    """Execute a full ingestion pipeline cycle.
 
-    Creates a new database session and HTTP client, polls all feeds,
-    and saves new articles to the database.
+    Creates a fresh database session and HTTP client, runs the full
+    pipeline (poll -> extract -> dedup -> cluster -> store), and
+    logs cycle statistics.
+
+    Args:
+        embed_model: sentence-transformers model from app.state.
     """
     log = logger.bind()
     settings = get_settings()
@@ -33,59 +36,46 @@ async def _run_feed_poll() -> None:
         )
         async with client:
             try:
-                candidates = await poll_all_feeds(session, client)
-
-                # Save new articles to database (without content -- content extraction
-                # happens in Plan 03)
-                new_count = 0
-                for candidate in candidates:
-                    article = Article(
-                        url=candidate.url,
-                        url_hash=candidate.url_hash,
-                        title=candidate.title,
-                        summary=candidate.summary,
-                        author=candidate.author,
-                        published_at=candidate.published_at,
-                        image_url=candidate.image_url,
-                        feed_id=candidate.feed_id,
-                    )
-                    session.add(article)
-                    new_count += 1
-
-                await session.commit()
+                stats = await run_ingestion_cycle(
+                    session, client, embed_model
+                )
 
                 await log.ainfo(
-                    "feed_poll_cycle_complete",
-                    new_articles=new_count,
+                    "ingestion_pipeline_cycle_complete",
                     timestamp=datetime.now(timezone.utc).isoformat(),
+                    **stats,
                 )
 
             except Exception as exc:
                 await session.rollback()
-                await log.aerror("feed_poll_cycle_error", error=str(exc))
+                await log.aerror("ingestion_pipeline_cycle_error", error=str(exc))
                 raise
 
 
-def create_scheduler() -> AsyncIOScheduler:
+def create_scheduler(embed_model=None) -> AsyncIOScheduler:
     """Create and configure the APScheduler instance.
 
-    Returns an AsyncIOScheduler with the feed polling job configured
+    Returns an AsyncIOScheduler with the ingestion pipeline job configured
     to run at the interval specified in settings.
 
     The scheduler is NOT started -- call scheduler.start() after creation.
+
+    Args:
+        embed_model: sentence-transformers model to pass to pipeline jobs.
     """
     settings = get_settings()
 
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
-        _run_feed_poll,
+        _run_ingestion_pipeline,
         trigger="interval",
         minutes=settings.polling_interval_minutes,
-        id="feed_poller",
-        name="RSS Feed Poller",
+        id="ingestion_pipeline",
+        name="Ingestion Pipeline",
         max_instances=1,
         coalesce=True,
         next_run_time=datetime.now(timezone.utc),  # Run immediately on start
+        kwargs={"embed_model": embed_model},
     )
 
     return scheduler
