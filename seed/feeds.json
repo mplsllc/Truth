@@ -1,0 +1,466 @@
+[
+  {
+    "name": "Reuters - Top News",
+    "url": "https://feeds.reuters.com/reuters/topNews",
+    "website_url": "https://www.reuters.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "international"
+  },
+  {
+    "name": "Reuters - World",
+    "url": "https://feeds.reuters.com/reuters/worldNews",
+    "website_url": "https://www.reuters.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "international"
+  },
+  {
+    "name": "Associated Press - Top News",
+    "url": "https://rsshub.app/apnews/topics/apf-topnews",
+    "website_url": "https://apnews.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "BBC News - World",
+    "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "website_url": "https://www.bbc.com/news",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "uk"
+  },
+  {
+    "name": "BBC News - Top Stories",
+    "url": "https://feeds.bbci.co.uk/news/rss.xml",
+    "website_url": "https://www.bbc.com/news",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "uk"
+  },
+  {
+    "name": "NPR News",
+    "url": "https://feeds.npr.org/1001/rss.xml",
+    "website_url": "https://www.npr.org",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "PBS NewsHour",
+    "url": "https://www.pbs.org/newshour/feeds/rss/headlines",
+    "website_url": "https://www.pbs.org/newshour",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "The Guardian - World",
+    "url": "https://www.theguardian.com/world/rss",
+    "website_url": "https://www.theguardian.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "uk"
+  },
+  {
+    "name": "The Guardian - US News",
+    "url": "https://www.theguardian.com/us-news/rss",
+    "website_url": "https://www.theguardian.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Al Jazeera",
+    "url": "https://www.aljazeera.com/xml/rss/all.xml",
+    "website_url": "https://www.aljazeera.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "international"
+  },
+  {
+    "name": "Deutsche Welle",
+    "url": "https://rss.dw.com/rdf/rss-en-all",
+    "website_url": "https://www.dw.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "international"
+  },
+  {
+    "name": "New York Times - Top Stories",
+    "url": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    "website_url": "https://www.nytimes.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Washington Post - National",
+    "url": "https://feeds.washingtonpost.com/rss/national",
+    "website_url": "https://www.washingtonpost.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Wall Street Journal - World",
+    "url": "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+    "website_url": "https://www.wsj.com",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "CNN - Top Stories",
+    "url": "http://rss.cnn.com/rss/cnn_topstories.rss",
+    "website_url": "https://www.cnn.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "CNN - World",
+    "url": "http://rss.cnn.com/rss/cnn_world.rss",
+    "website_url": "https://www.cnn.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "ABC News",
+    "url": "https://abcnews.go.com/abcnews/topstories",
+    "website_url": "https://abcnews.go.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "CBS News",
+    "url": "https://www.cbsnews.com/latest/rss/main",
+    "website_url": "https://www.cbsnews.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "NBC News",
+    "url": "https://feeds.nbcnews.com/nbcnews/public/news",
+    "website_url": "https://www.nbcnews.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Fox News - Latest",
+    "url": "https://moxie.foxnews.com/google-publisher/latest.xml",
+    "website_url": "https://www.foxnews.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "USA Today",
+    "url": "http://rssfeeds.usatoday.com/UsatodaycomNation-TopStories",
+    "website_url": "https://www.usatoday.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Los Angeles Times",
+    "url": "https://www.latimes.com/world-nation/rss2.0.xml",
+    "website_url": "https://www.latimes.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Chicago Tribune",
+    "url": "https://www.chicagotribune.com/arcio/rss/category/nation-world/",
+    "website_url": "https://www.chicagotribune.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Boston Globe",
+    "url": "https://www.bostonglobe.com/arc/outboundfeeds/rss/metro/?outputType=xml",
+    "website_url": "https://www.bostonglobe.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Minneapolis Star Tribune",
+    "url": "https://www.startribune.com/local/index.rss2",
+    "website_url": "https://www.startribune.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Denver Post",
+    "url": "https://www.denverpost.com/feed/",
+    "website_url": "https://www.denverpost.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Seattle Times",
+    "url": "https://www.seattletimes.com/feed/",
+    "website_url": "https://www.seattletimes.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Atlanta Journal-Constitution",
+    "url": "https://www.ajc.com/arc/outboundfeeds/rss/news/?outputType=xml",
+    "website_url": "https://www.ajc.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Miami Herald",
+    "url": "https://www.miamiherald.com/latest-news/index.rss",
+    "website_url": "https://www.miamiherald.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Ars Technica",
+    "url": "https://feeds.arstechnica.com/arstechnica/index",
+    "website_url": "https://arstechnica.com",
+    "trust_tier": "medium",
+    "category": "tech",
+    "region": "us"
+  },
+  {
+    "name": "The Verge",
+    "url": "https://www.theverge.com/rss/index.xml",
+    "website_url": "https://www.theverge.com",
+    "trust_tier": "medium",
+    "category": "tech",
+    "region": "us"
+  },
+  {
+    "name": "Wired",
+    "url": "https://www.wired.com/feed/rss",
+    "website_url": "https://www.wired.com",
+    "trust_tier": "medium",
+    "category": "tech",
+    "region": "us"
+  },
+  {
+    "name": "TechCrunch",
+    "url": "https://techcrunch.com/feed/",
+    "website_url": "https://techcrunch.com",
+    "trust_tier": "medium",
+    "category": "tech",
+    "region": "us"
+  },
+  {
+    "name": "Hacker News - Best",
+    "url": "https://hnrss.org/best",
+    "website_url": "https://news.ycombinator.com",
+    "trust_tier": "medium",
+    "category": "tech",
+    "region": "us"
+  },
+  {
+    "name": "Nature News",
+    "url": "https://www.nature.com/nature.rss",
+    "website_url": "https://www.nature.com",
+    "trust_tier": "medium",
+    "category": "science",
+    "region": "international"
+  },
+  {
+    "name": "Scientific American",
+    "url": "http://rss.sciam.com/ScientificAmerican-Global",
+    "website_url": "https://www.scientificamerican.com",
+    "trust_tier": "medium",
+    "category": "science",
+    "region": "us"
+  },
+  {
+    "name": "New Scientist",
+    "url": "https://www.newscientist.com/feed/home/",
+    "website_url": "https://www.newscientist.com",
+    "trust_tier": "medium",
+    "category": "science",
+    "region": "uk"
+  },
+  {
+    "name": "Phys.org",
+    "url": "https://phys.org/rss-feed/",
+    "website_url": "https://phys.org",
+    "trust_tier": "medium",
+    "category": "science",
+    "region": "international"
+  },
+  {
+    "name": "Bloomberg",
+    "url": "https://feeds.bloomberg.com/markets/news.rss",
+    "website_url": "https://www.bloomberg.com",
+    "trust_tier": "medium",
+    "category": "business",
+    "region": "us"
+  },
+  {
+    "name": "Financial Times",
+    "url": "https://www.ft.com/rss/home",
+    "website_url": "https://www.ft.com",
+    "trust_tier": "medium",
+    "category": "business",
+    "region": "uk"
+  },
+  {
+    "name": "CNBC - Top News",
+    "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
+    "website_url": "https://www.cnbc.com",
+    "trust_tier": "medium",
+    "category": "business",
+    "region": "us"
+  },
+  {
+    "name": "MarketWatch",
+    "url": "http://feeds.marketwatch.com/marketwatch/topstories/",
+    "website_url": "https://www.marketwatch.com",
+    "trust_tier": "medium",
+    "category": "business",
+    "region": "us"
+  },
+  {
+    "name": "The Economist - World",
+    "url": "https://www.economist.com/international/rss.xml",
+    "website_url": "https://www.economist.com",
+    "trust_tier": "medium",
+    "category": "general",
+    "region": "international"
+  },
+  {
+    "name": "BBC Sport",
+    "url": "https://feeds.bbci.co.uk/sport/rss.xml",
+    "website_url": "https://www.bbc.com/sport",
+    "trust_tier": "medium",
+    "category": "sports",
+    "region": "uk"
+  },
+  {
+    "name": "ESPN - Top Headlines",
+    "url": "https://www.espn.com/espn/rss/news",
+    "website_url": "https://www.espn.com",
+    "trust_tier": "medium",
+    "category": "sports",
+    "region": "us"
+  },
+  {
+    "name": "The Atlantic",
+    "url": "https://www.theatlantic.com/feed/all/",
+    "website_url": "https://www.theatlantic.com",
+    "trust_tier": "low",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "The New Yorker",
+    "url": "https://www.newyorker.com/feed/everything",
+    "website_url": "https://www.newyorker.com",
+    "trust_tier": "low",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "Politico",
+    "url": "https://www.politico.com/rss/politicopicks.xml",
+    "website_url": "https://www.politico.com",
+    "trust_tier": "low",
+    "category": "politics",
+    "region": "us"
+  },
+  {
+    "name": "The Hill",
+    "url": "https://thehill.com/feed/",
+    "website_url": "https://thehill.com",
+    "trust_tier": "low",
+    "category": "politics",
+    "region": "us"
+  },
+  {
+    "name": "Vox",
+    "url": "https://www.vox.com/rss/index.xml",
+    "website_url": "https://www.vox.com",
+    "trust_tier": "low",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "The Intercept",
+    "url": "https://theintercept.com/feed/?rss",
+    "website_url": "https://theintercept.com",
+    "trust_tier": "low",
+    "category": "politics",
+    "region": "us"
+  },
+  {
+    "name": "ProPublica",
+    "url": "https://feeds.propublica.org/propublica/main",
+    "website_url": "https://www.propublica.org",
+    "trust_tier": "high",
+    "category": "general",
+    "region": "us"
+  },
+  {
+    "name": "BBC Technology",
+    "url": "https://feeds.bbci.co.uk/news/technology/rss.xml",
+    "website_url": "https://www.bbc.com/news/technology",
+    "trust_tier": "high",
+    "category": "tech",
+    "region": "uk"
+  },
+  {
+    "name": "Reuters - Technology",
+    "url": "https://feeds.reuters.com/reuters/technologyNews",
+    "website_url": "https://www.reuters.com",
+    "trust_tier": "high",
+    "category": "tech",
+    "region": "international"
+  },
+  {
+    "name": "NPR - Politics",
+    "url": "https://feeds.npr.org/1014/rss.xml",
+    "website_url": "https://www.npr.org/sections/politics",
+    "trust_tier": "high",
+    "category": "politics",
+    "region": "us"
+  },
+  {
+    "name": "BBC Business",
+    "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
+    "website_url": "https://www.bbc.com/news/business",
+    "trust_tier": "high",
+    "category": "business",
+    "region": "uk"
+  },
+  {
+    "name": "Variety",
+    "url": "https://variety.com/feed/",
+    "website_url": "https://variety.com",
+    "trust_tier": "medium",
+    "category": "entertainment",
+    "region": "us"
+  },
+  {
+    "name": "The Hollywood Reporter",
+    "url": "https://www.hollywoodreporter.com/feed/",
+    "website_url": "https://www.hollywoodreporter.com",
+    "trust_tier": "medium",
+    "category": "entertainment",
+    "region": "us"
+  }
+]

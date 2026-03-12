@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Boolean, Integer, String, Text
+from sqlalchemy import Boolean, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -35,7 +35,7 @@ class Feed(Base):
     error_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     article_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False, server_default="now()"
+        nullable=False, default=lambda: datetime.now(timezone.utc), server_default=func.now()
     )
 
     articles: Mapped[list[Article]] = relationship(
