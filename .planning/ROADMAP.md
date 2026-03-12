@@ -89,7 +89,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Ingestion | 1/4 | Executing | - |
+| 1. Foundation and Ingestion | 2/4 | In Progress|  |
 | 2. Fact-Check Pipeline | 0/? | Not started | - |
 | 3. Scoring and Core Display | 0/? | Not started | - |
 | 4. Navigation and Discovery | 0/? | Not started | - |

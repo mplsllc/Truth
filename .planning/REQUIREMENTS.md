@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **INGEST-01**: System continuously polls 50+ curated RSS feeds for new articles
 - [ ] **INGEST-02**: System extracts article metadata (title, image, publication date, author, source, summary) from each feed item
-- [ ] **INGEST-03**: System extracts full article content from URLs when RSS provides only summaries
+- [x] **INGEST-03**: System extracts full article content from URLs when RSS provides only summaries
 - [ ] **INGEST-04**: System deduplicates stories covering the same event using near-match detection
 - [ ] **INGEST-05**: System handles malformed RSS feeds gracefully without crashing the polling loop
 
@@ -81,7 +81,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | INGEST-01 | Phase 1 | In Progress (01-01: models + seed data) |
 | INGEST-02 | Phase 1 | Pending |
-| INGEST-03 | Phase 1 | Pending |
+| INGEST-03 | Phase 1 | Complete |
 | INGEST-04 | Phase 1 | Pending |
 | INGEST-05 | Phase 1 | In Progress (01-01: Feed model with error tracking) |
 | FACT-01 | Phase 2 | Pending |
