@@ -14,8 +14,10 @@ from sqlalchemy import select, func
 
 from app.config import get_settings
 from app.db.session import async_session_factory
+from app.models.article import Article
 from app.models.feed import Feed
 from app.models.enums import TrustTier, FeedStatus
+from app.tasks.scheduler import create_scheduler
 
 SEED_FILE = Path(__file__).parent.parent / "seed" / "feeds.json"
 
@@ -92,7 +94,33 @@ async def lifespan(app: FastAPI):
     # Store session factory on app state for dependency injection
     app.state.async_session_factory = async_session_factory
 
+    # Load sentence-transformers embedding model (once at startup per Pitfall 2)
+    try:
+        from sentence_transformers import SentenceTransformer
+
+        embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+        app.state.embed_model = embed_model
+        await log.ainfo("embed_model_loaded", model="all-MiniLM-L6-v2")
+    except Exception as exc:
+        app.state.embed_model = None
+        await log.awarn("embed_model_load_failed", error=str(exc))
+
+    # Create and start the APScheduler
+    try:
+        scheduler = create_scheduler()
+        scheduler.start()
+        app.state.scheduler = scheduler
+        await log.ainfo("scheduler_started")
+    except Exception as exc:
+        app.state.scheduler = None
+        await log.awarn("scheduler_start_failed", error=str(exc))
+
     yield
+
+    # Shutdown scheduler
+    if getattr(app.state, "scheduler", None):
+        app.state.scheduler.shutdown(wait=False)
+        await log.ainfo("scheduler_stopped")
 
     await log.ainfo("app_shutting_down")
 
@@ -117,3 +145,27 @@ app.add_middleware(
 async def health_check():
     """Health check endpoint."""
     return {"status": "ok", "version": "0.1.0"}
+
+
+@app.get("/api/status")
+async def system_status():
+    """System status endpoint showing feeds, articles, scheduler state, and last poll time."""
+    async with async_session_factory() as session:
+        feed_count = await session.scalar(select(func.count(Feed.id))) or 0
+        article_count = await session.scalar(select(func.count(Article.id))) or 0
+
+        # Get last poll time from most recently polled feed
+        last_poll_result = await session.scalar(
+            select(func.max(Feed.last_polled_at))
+        )
+
+    scheduler = getattr(app.state, "scheduler", None)
+    scheduler_running = scheduler is not None and scheduler.running if scheduler else False
+
+    return {
+        "feeds": feed_count,
+        "articles": article_count,
+        "scheduler_running": scheduler_running,
+        "last_poll_time": last_poll_result.isoformat() if last_poll_result else None,
+        "version": "0.1.0",
+    }
