@@ -12,7 +12,7 @@ Truth delivers a fact-checked news aggregator in four phases following a strict 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation and Ingestion** - Project skeleton, database, Docker services, RSS polling, article extraction, and deduplication
+- [x] **Phase 1: Foundation and Ingestion** - Project skeleton, database, Docker services, RSS polling, article extraction, and deduplication
 - [ ] **Phase 2: Fact-Check Pipeline** - Ollama LLM integration for claim extraction, cross-reference verification, and async processing
 - [ ] **Phase 3: Scoring and Core Display** - Composite credibility scoring, magazine-style UI with badges, fact-check detail views
 - [ ] **Phase 4: Navigation and Discovery** - Category filtering, keyword search, and temporal browsing
@@ -34,8 +34,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md -- Project skeleton, Docker infrastructure, database models, seed data
 - [x] 01-02-PLAN.md -- RSS feed polling, metadata extraction, APScheduler integration
-- [ ] 01-03-PLAN.md -- Full article content extraction (trafilatura + Playwright fallback)
-- [ ] 01-04-PLAN.md -- Semantic deduplication, story clustering, end-to-end pipeline wiring
+- [x] 01-03-PLAN.md -- Full article content extraction (trafilatura + Playwright fallback)
+- [x] 01-04-PLAN.md -- Semantic deduplication, story clustering, end-to-end pipeline wiring
 
 ### Phase 2: Fact-Check Pipeline
 **Goal**: Every ingested article is automatically fact-checked by a local LLM, with verifiable claims extracted and checked against cross-referenced sources
@@ -89,7 +89,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Ingestion | 2/4 | In Progress|  |
+| 1. Foundation and Ingestion | 4/4 | Complete | 2026-03-12 |
 | 2. Fact-Check Pipeline | 0/? | Not started | - |
 | 3. Scoring and Core Display | 0/? | Not started | - |
 | 4. Navigation and Discovery | 0/? | Not started | - |
