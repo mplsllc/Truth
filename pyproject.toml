@@ -1,0 +1,10 @@
+[project]
+name = "truth"
+version = "0.1.0"
+description = "A fact-checked news aggregator powered by local LLM"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+timeout = 30
+testpaths = ["tests"]
