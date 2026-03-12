@@ -11,13 +11,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+import httpx
+
 from app.services.content_extractor import (
     ExtractedContent,
     detect_opinion,
     detect_wire_story,
     extract_content,
 )
-from app.services.http_client import HttpResponse, RateLimitedClient
+from app.services.http_client import RateLimitedClient
 
 # ---------------------------------------------------------------------------
 # Sample HTML fixtures
@@ -189,14 +191,13 @@ OPINION_HTML = """
 
 def make_mock_client(html: str, status_code: int = 200) -> RateLimitedClient:
     """Create a mock RateLimitedClient that returns given HTML."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = status_code
+    mock_response.text = html
+    mock_response.url = httpx.URL("https://example.com/article")
+
     client = AsyncMock(spec=RateLimitedClient)
-    client.get = AsyncMock(
-        return_value=HttpResponse(
-            status_code=status_code,
-            text=html,
-            url="https://example.com/article",
-        )
-    )
+    client.get = AsyncMock(return_value=mock_response)
     return client
 
 
