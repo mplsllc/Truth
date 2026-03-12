@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 ## Current Position
 
 Phase: 1 of 4 (Foundation and Ingestion)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-12 — Completed Plan 01-01 (project skeleton)
+Last activity: 2026-03-12 — Completed Plan 01-02 (RSS feed polling)
 
-Progress: [██░░░░░░░░] 25%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Progress: [██░░░░░░░░] 25%
 - Trend: baseline
 
 *Updated after each plan completion*
+| Phase 01 P02 | 5min | 2 tasks | 9 files |
 | Phase 01 P03 | 3min | 1 tasks | 3 files |
 
 ## Accumulated Context
@@ -65,6 +66,10 @@ Recent decisions affecting current work:
 - Plan 01-01: Python-side datetime defaults + func.now() server_default for SQLite test compat
 - Plan 01-01: Vector(384) for all-MiniLM-L6-v2 embeddings with HNSW index
 - Plan 01-01: SQLite + aiosqlite for unit tests with runtime Vector-to-Text column swap
+- Plan 01-02: Per-domain rate limiting uses asyncio.Lock per domain to serialize requests and enforce delay
+- Plan 01-02: URL normalization strips UTM/tracking params, fragments, trailing slashes before SHA-256 hashing
+- Plan 01-02: Scheduler triggers immediate first poll on startup (next_run_time=now)
+- Plan 01-02: Embedding model load wrapped in try/except so app starts even if model download fails
 - [Phase 01]: Adapted content extractor to Plan 01-02 RateLimitedClient interface (httpx.Response)
 - [Phase 01]: Playwright concurrency capped at 3 via module-level asyncio.Semaphore
 

@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Ingestion
 
-- [ ] **INGEST-01**: System continuously polls 50+ curated RSS feeds for new articles
-- [ ] **INGEST-02**: System extracts article metadata (title, image, publication date, author, source, summary) from each feed item
+- [x] **INGEST-01**: System continuously polls 50+ curated RSS feeds for new articles
+- [x] **INGEST-02**: System extracts article metadata (title, image, publication date, author, source, summary) from each feed item
 - [x] **INGEST-03**: System extracts full article content from URLs when RSS provides only summaries
 - [ ] **INGEST-04**: System deduplicates stories covering the same event using near-match detection
-- [ ] **INGEST-05**: System handles malformed RSS feeds gracefully without crashing the polling loop
+- [x] **INGEST-05**: System handles malformed RSS feeds gracefully without crashing the polling loop
 
 ### Fact-Checking
 
@@ -79,11 +79,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INGEST-01 | Phase 1 | In Progress (01-01: models + seed data) |
-| INGEST-02 | Phase 1 | Pending |
+| INGEST-01 | Phase 1 | Complete (01-02: APScheduler polling) |
+| INGEST-02 | Phase 1 | Complete (01-02: feedparser metadata extraction) |
 | INGEST-03 | Phase 1 | Complete |
 | INGEST-04 | Phase 1 | Pending |
-| INGEST-05 | Phase 1 | In Progress (01-01: Feed model with error tracking) |
+| INGEST-05 | Phase 1 | Complete (01-02: per-feed error isolation) |
 | FACT-01 | Phase 2 | Pending |
 | FACT-02 | Phase 2 | Pending |
 | FACT-03 | Phase 2 | Pending |

@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Project skeleton, Docker infrastructure, database models, seed data
-- [ ] 01-02-PLAN.md -- RSS feed polling, metadata extraction, APScheduler integration
+- [x] 01-02-PLAN.md -- RSS feed polling, metadata extraction, APScheduler integration
 - [ ] 01-03-PLAN.md -- Full article content extraction (trafilatura + Playwright fallback)
 - [ ] 01-04-PLAN.md -- Semantic deduplication, story clustering, end-to-end pipeline wiring
 
