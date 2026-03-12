@@ -111,7 +111,7 @@ class TestDeduplicateArticle:
 
         mock_model = make_mock_embed_model()
 
-        result = await deduplicate_article(article, db_session, mock_model)
+        result = await deduplicate_article(article, db_session, mock_model, similarity_threshold=0.83)
 
         assert result == "new"
 
@@ -119,6 +119,7 @@ class TestDeduplicateArticle:
     async def test_existing_url_hash_returns_duplicate(self, db_session):
         """deduplicate_article with existing url_hash returns 'duplicate' (exact URL match)."""
         from app.services.deduplicator import deduplicate_article
+        from app.services.feed_poller import normalize_url
 
         feed = make_feed(db_session)
         await db_session.flush()
@@ -132,18 +133,21 @@ class TestDeduplicateArticle:
         )
         await db_session.flush()
 
-        # Create a new article with the same URL
-        new_article = make_article(
-            db_session,
-            feed_id=feed.id,
-            url="https://example.com/same-article",
+        # Create an Article object with the same URL but don't add to session
+        # (simulates what pipeline would do before dedup check)
+        url = "https://example.com/same-article"
+        normalized = normalize_url(url)
+        url_hash = hashlib.sha256(normalized.encode()).hexdigest()
+        new_article = Article(
+            url=normalized,
+            url_hash=url_hash,
             title="Same URL Different Title",
+            feed_id=feed.id,
         )
-        # Don't flush -- the url_hash match should catch it in-database
 
         mock_model = make_mock_embed_model()
 
-        result = await deduplicate_article(new_article, db_session, mock_model)
+        result = await deduplicate_article(new_article, db_session, mock_model, similarity_threshold=0.83)
 
         assert result == "duplicate"
 
@@ -182,7 +186,7 @@ class TestDeduplicateArticle:
         # Model returns similar vector for second article
         mock_model_second = make_mock_embed_model(make_similar_vector())
 
-        result = await deduplicate_article(second_article, db_session, mock_model_second)
+        result = await deduplicate_article(second_article, db_session, mock_model_second, similarity_threshold=0.83)
 
         # Should return the cluster_id as an integer
         assert isinstance(result, int)
@@ -224,7 +228,7 @@ class TestDeduplicateArticle:
         mock_model_dissimilar = make_mock_embed_model(make_dissimilar_vector())
 
         result = await deduplicate_article(
-            second_article, db_session, mock_model_dissimilar
+            second_article, db_session, mock_model_dissimilar, similarity_threshold=0.83
         )
 
         assert result == "new"
@@ -265,7 +269,7 @@ class TestDeduplicateArticle:
         mock_model_opinion = make_mock_embed_model(make_similar_vector())
 
         result = await deduplicate_article(
-            opinion_article, db_session, mock_model_opinion
+            opinion_article, db_session, mock_model_opinion, similarity_threshold=0.83
         )
 
         # Should NOT join the news cluster -- should be "new"
@@ -305,7 +309,7 @@ class TestDeduplicateArticle:
         mock_model_moderate = make_mock_embed_model(make_moderate_vector())
 
         result = await deduplicate_article(
-            same_topic_article, db_session, mock_model_moderate
+            same_topic_article, db_session, mock_model_moderate, similarity_threshold=0.83
         )
 
         assert result == "new"
