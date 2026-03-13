@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Truth - Fact-Checked News{% endblock %}
+
+{% block content %}
+<main class="main">
+    <nav class="filters-bar">
+        {% if categories %}
+        <div class="categories">
+            <a href="/" class="cat-link {{ 'active' if not current_category and not current_period else '' }}">All</a>
+            {% for cat in categories %}
+            <a href="/?category={{ cat }}" class="cat-link {{ 'active' if current_category == cat else '' }}">{{ cat }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="time-filters">
+            <a href="/?period=today{% if current_category %}&category={{ current_category }}{% endif %}" class="cat-link {{ 'active' if current_period == 'today' else '' }}">Today</a>
+            <a href="/?period=week{% if current_category %}&category={{ current_category }}{% endif %}" class="cat-link {{ 'active' if current_period == 'week' else '' }}">This Week</a>
+            <a href="/?period=month{% if current_category %}&category={{ current_category }}{% endif %}" class="cat-link {{ 'active' if current_period == 'month' else '' }}">This Month</a>
+        </div>
+    </nav>
+
+    {% if clusters %}
+    <div class="stories">
+        {% for cluster in clusters %}
+        <article class="story-card {{ 'hero' if loop.first and not current_category else '' }}">
+            {% if cluster.image_url %}
+            <img class="card-image" src="{{ cluster.image_url }}" alt="" loading="lazy">
+            {% else %}
+            <div class="card-image-placeholder">&#9673;</div>
+            {% endif %}
+            <div class="card-body">
+                <div class="card-source">
+                    <span class="source-name">{{ cluster.source_name }}</span>
+                    <span class="source-time">{{ cluster.time_ago }}</span>
+                </div>
+                <h2 class="card-title">
+                    <a href="/story/{{ cluster.id }}">{{ cluster.title }}</a>
+                </h2>
+                <p class="card-summary">{{ cluster.summary or '' }}</p>
+                <div class="card-badges">
+                    {% if cluster.score is not none %}
+                    <span class="badge badge-score badge-{{ cluster.score_class }}">{{ cluster.score_label }}</span>
+                    {% else %}
+                    <span class="badge badge-score badge-pending">Pending</span>
+                    {% endif %}
+                    {% if cluster.article_count > 1 %}
+                    <span class="badge badge-sources">{{ cluster.article_count }} sources</span>
+                    {% endif %}
+                    {% if cluster.claim_count > 0 %}
+                    <span class="badge badge-claims">{{ cluster.claim_count }} claims</span>
+                    {% endif %}
+                </div>
+                {% if cluster.score is not none %}
+                <div class="score-bar-container">
+                    <div class="score-bar">
+                        <div class="score-bar-fill" style="width: {{ (cluster.score * 100)|int }}%; background: {{ cluster.score_color }};"></div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h2>No stories yet</h2>
+        <p>The ingestion pipeline is running. Stories will appear once articles are collected and fact-checked.</p>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

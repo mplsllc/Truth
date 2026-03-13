@@ -1,6 +1,7 @@
 """Alembic async migration environment."""
 
 import asyncio
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -10,12 +11,16 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.db.base import Base
 
 # Import all models so they register with Base.metadata
-from app.models import Article, Feed, StoryCluster  # noqa: F401
+from app.models import Article, Claim, Feed, StoryCluster  # noqa: F401
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+# Override with DATABASE_URL env var if set (used inside Docker)
+if os.environ.get("DATABASE_URL"):
+    config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
 
 target_metadata = Base.metadata
 

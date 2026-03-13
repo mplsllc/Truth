@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Truth{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">Truth<span>.</span></a>
+            <form class="search-form" action="/" method="get">
+                <input type="text" name="q" class="search-input" placeholder="Search stories..." value="{{ search_query|default('', true) }}">
+            </form>
+            <div class="header-meta">
+                {{ stats.articles }} articles &middot; {{ stats.feeds }} sources
+            </div>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+        Truth &mdash; AI fact-checked news aggregator &middot; Scores are AI-generated and may contain errors
+    </footer>
+</body>
+</html>

@@ -20,14 +20,24 @@ from app.models.feed import Feed
 # ---------------------------------------------------------------------------
 
 
+_dedup_feed_counter = 1000
+_dedup_article_counter = 5000
+
+
 def make_feed(
     db_session,
-    feed_id: int = 1,
+    feed_id: int | None = None,
     name: str = "Test Feed",
-    url: str = "https://example.com/feed.xml",
+    url: str | None = None,
     trust_tier: TrustTier = TrustTier.MEDIUM,
 ) -> Feed:
     """Create and add a Feed to the session."""
+    global _dedup_feed_counter
+    _dedup_feed_counter += 1
+    if feed_id is None:
+        feed_id = _dedup_feed_counter
+    if url is None:
+        url = f"https://dedup-test-{feed_id}.example.com/feed.xml"
     feed = Feed(id=feed_id, name=name, url=url, trust_tier=trust_tier)
     db_session.add(feed)
     return feed
@@ -36,15 +46,19 @@ def make_feed(
 def make_article(
     db_session,
     feed_id: int,
-    url: str = "https://example.com/article-1",
+    url: str | None = None,
     title: str = "Test Article",
     summary: str | None = "Test summary content here for embedding purposes",
     is_opinion: bool = False,
     cluster_id: int | None = None,
 ) -> Article:
     """Create and add an Article to the session."""
+    global _dedup_article_counter
     from app.services.feed_poller import normalize_url
 
+    if url is None:
+        _dedup_article_counter += 1
+        url = f"https://dedup-test.example.com/article-{_dedup_article_counter}"
     normalized = normalize_url(url)
     url_hash = hashlib.sha256(normalized.encode()).hexdigest()
     article = Article(
@@ -396,16 +410,12 @@ class TestFindOrCreateCluster:
         # Create low-tier feed and high-tier feed
         low_feed = make_feed(
             db_session,
-            feed_id=1,
             name="Low Trust Blog",
-            url="https://blog.example.com/feed",
             trust_tier=TrustTier.LOW,
         )
         high_feed = make_feed(
             db_session,
-            feed_id=2,
             name="Reuters",
-            url="https://reuters.com/feed",
             trust_tier=TrustTier.HIGH,
         )
         await db_session.flush()
@@ -414,7 +424,7 @@ class TestFindOrCreateCluster:
         low_article = make_article(
             db_session,
             feed_id=low_feed.id,
-            url="https://blog.example.com/article",
+            url=f"https://blog.example.com/article-{low_feed.id}",
             title="Event From Blog",
         )
         await db_session.flush()
@@ -431,7 +441,7 @@ class TestFindOrCreateCluster:
         high_article = make_article(
             db_session,
             feed_id=high_feed.id,
-            url="https://reuters.com/article",
+            url=f"https://reuters.com/article-{high_feed.id}",
             title="Same Event From Reuters",
         )
         await db_session.flush()
@@ -449,16 +459,12 @@ class TestFindOrCreateCluster:
 
         high_feed = make_feed(
             db_session,
-            feed_id=1,
             name="Reuters",
-            url="https://reuters.com/feed",
             trust_tier=TrustTier.HIGH,
         )
         low_feed = make_feed(
             db_session,
-            feed_id=2,
             name="Blog",
-            url="https://blog.example.com/feed",
             trust_tier=TrustTier.LOW,
         )
         await db_session.flush()
@@ -467,7 +473,7 @@ class TestFindOrCreateCluster:
         high_article = make_article(
             db_session,
             feed_id=high_feed.id,
-            url="https://reuters.com/article",
+            url=f"https://reuters.com/article-high-{high_feed.id}",
             title="High Trust Article",
         )
         await db_session.flush()
@@ -484,7 +490,7 @@ class TestFindOrCreateCluster:
         low_article = make_article(
             db_session,
             feed_id=low_feed.id,
-            url="https://blog.example.com/article",
+            url=f"https://blog.example.com/article-low-{low_feed.id}",
             title="Same Event From Blog",
         )
         await db_session.flush()

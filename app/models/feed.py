@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Boolean, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -22,20 +22,20 @@ class Feed(Base):
     website_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
     favicon_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
     trust_tier: Mapped[TrustTier] = mapped_column(
-        default=TrustTier.MEDIUM, nullable=False
+        String(20), default=TrustTier.MEDIUM, nullable=False
     )
     category: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     region: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     status: Mapped[FeedStatus] = mapped_column(
-        default=FeedStatus.ACTIVE, nullable=False
+        String(20), default=FeedStatus.ACTIVE, nullable=False
     )
     enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    last_polled_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
+    last_polled_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     last_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     error_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     article_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False, default=lambda: datetime.now(timezone.utc), server_default=func.now()
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), server_default=func.now()
     )
 
     articles: Mapped[list[Article]] = relationship(

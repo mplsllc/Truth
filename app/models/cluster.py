@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Boolean, Float, Index, Integer, Text, func
+from sqlalchemy import Boolean, DateTime, Float, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -24,7 +24,7 @@ class StoryCluster(Base):
         Vector(384), nullable=True
     )
     status: Mapped[ClusterStatus] = mapped_column(
-        default=ClusterStatus.ACTIVE, nullable=False
+        String(20), default=ClusterStatus.ACTIVE, nullable=False
     )
     primary_article_id: Mapped[Optional[int]] = mapped_column(
         Integer, nullable=True
@@ -34,10 +34,10 @@ class StoryCluster(Base):
     category: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     composite_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        nullable=False, default=lambda: datetime.now(timezone.utc), server_default=func.now()
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        nullable=False, default=lambda: datetime.now(timezone.utc), server_default=func.now(),
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), server_default=func.now(),
         onupdate=lambda: datetime.now(timezone.utc)
     )
 

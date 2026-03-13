@@ -19,8 +19,12 @@ class Settings(BaseSettings):
     # Ollama
     ollama_url: str = "http://ollama:11434"
 
-    # Optional HTTP proxy
+    # Optional HTTP proxy (empty string treated as None)
     http_proxy: Optional[str] = None
+
+    @property
+    def effective_http_proxy(self) -> Optional[str]:
+        return self.http_proxy if self.http_proxy else None
 
     # Admin credentials
     admin_username: str = "admin"
@@ -35,6 +39,11 @@ class Settings(BaseSettings):
     # Rate limiting
     max_concurrent_requests: int = 15
     per_domain_delay_seconds: float = 2.0
+
+    # Fact-checking
+    fact_check_interval_seconds: int = 30
+    fact_check_article_max_age_hours: int = 24
+    ollama_model: str = "llama3.1:8b"
 
     # Logging
     log_level: str = "INFO"

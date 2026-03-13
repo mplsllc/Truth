@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ cluster.title or 'Story' }} - Truth{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-header">
+        <h1 class="detail-title">{{ cluster.title or primary.title }}</h1>
+        <div class="detail-meta">
+            <span>{{ primary.source_name }}</span>
+            <span>&middot;</span>
+            <span>{{ primary.time_ago }}</span>
+            {% if cluster.article_count > 1 %}
+            <span>&middot;</span>
+            <span>{{ cluster.article_count }} sources covering this story</span>
+            {% endif %}
+        </div>
+        <div class="card-badges">
+            {% if primary.score is not none %}
+            <span class="badge badge-score badge-{{ primary.score_class }}">{{ primary.score_label }} ({{ (primary.score * 100)|int }}%)</span>
+            {% else %}
+            <span class="badge badge-score badge-pending">Pending fact-check</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if primary.score is not none %}
+    <div class="detail-score-card">
+        <div class="detail-score-header">
+            <div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Accuracy Score</div>
+                <div class="detail-score-value" style="color: {{ primary.score_color }};">{{ (primary.score * 100)|int }}%</div>
+            </div>
+            <span class="badge badge-score badge-{{ primary.score_class }}" style="font-size: 0.85rem; padding: 0.35rem 1rem;">{{ primary.score_label }}</span>
+        </div>
+        <div class="detail-sub-scores">
+            <div class="detail-sub-score">
+                <div class="detail-sub-score-label">Claims Checked</div>
+                <div class="detail-sub-score-value">{{ primary.claim_count }}</div>
+            </div>
+            <div class="detail-sub-score">
+                <div class="detail-sub-score-label">Confirmed</div>
+                <div class="detail-sub-score-value" style="color: var(--green);">{{ primary.confirmed_count }}</div>
+            </div>
+            <div class="detail-sub-score">
+                <div class="detail-sub-score-label">Contradicted</div>
+                <div class="detail-sub-score-value" style="color: var(--red);">{{ primary.contradicted_count }}</div>
+            </div>
+            <div class="detail-sub-score">
+                <div class="detail-sub-score-label">Unverifiable</div>
+                <div class="detail-sub-score-value" style="color: var(--text-dim);">{{ primary.unverifiable_count }}</div>
+            </div>
+            <div class="detail-sub-score">
+                <div class="detail-sub-score-label">Source Tier</div>
+                <div class="detail-sub-score-value">{{ primary.trust_tier|upper }}</div>
+            </div>
+            <div class="detail-sub-score">
+                <div class="detail-sub-score-label">Coverage</div>
+                <div class="detail-sub-score-value">{{ cluster.article_count }} sources</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if cluster.summary %}
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem;">
+        <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; margin-bottom: 0.5rem;">AI Summary</div>
+        <p style="font-size: 0.95rem; line-height: 1.6;">{{ cluster.summary }}</p>
+    </div>
+    {% endif %}
+
+    {% if claims %}
+    <div class="claims-section">
+        <h2>Fact-Check Breakdown ({{ claims|length }} claims)</h2>
+        {% for claim in claims %}
+        <div class="claim-card">
+            <div class="claim-header">
+                {% if claim.verdict %}
+                <span class="claim-verdict verdict-{{ claim.verdict }}">{{ claim.verdict }}</span>
+                {% endif %}
+                {% if claim.confidence %}
+                <span class="claim-confidence">{{ claim.confidence }} confidence</span>
+                {% endif %}
+                <span class="claim-type">{{ claim.claim_type }}</span>
+            </div>
+            <div class="claim-text">{{ claim.claim_text }}</div>
+            {% if claim.original_quote %}
+            <div class="claim-quote">"{{ claim.original_quote }}"</div>
+            {% endif %}
+            {% if claim.reasoning %}
+            <div class="claim-reasoning">{{ claim.reasoning }}</div>
+            {% endif %}
+            {% if claim.supporting or claim.contradicting %}
+            <div class="claim-sources">
+                {% for s in claim.supporting %}
+                <span class="supporting">{{ s }}</span>
+                {% endfor %}
+                {% for s in claim.contradicting %}
+                <span class="contradicting">{{ s }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if articles|length > 1 %}
+    <div class="sources-section">
+        <h2>All Sources ({{ articles|length }})</h2>
+        {% for article in articles %}
+        <a href="{{ article.url }}" class="source-card" target="_blank" rel="noopener">
+            <span class="source-name" style="min-width: 120px;">{{ article.source_name }}</span>
+            <span class="source-title">{{ article.title }}</span>
+            <span class="badge badge-sources">{{ article.trust_tier }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <a href="{{ primary.url }}" class="original-link" target="_blank" rel="noopener">Read Original Article &rarr;</a>
+</div>
+{% endblock %}

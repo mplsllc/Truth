@@ -47,7 +47,8 @@ class TestEnums:
         assert FactCheckStatus.IN_PROGRESS.value == "in_progress"
         assert FactCheckStatus.COMPLETE.value == "complete"
         assert FactCheckStatus.FAILED.value == "failed"
-        assert len(FactCheckStatus) == 4
+        assert FactCheckStatus.EXPIRED.value == "expired"
+        assert len(FactCheckStatus) == 5
 
 
 class TestFeedModel:

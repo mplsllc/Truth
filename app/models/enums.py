@@ -23,3 +23,16 @@ class FactCheckStatus(str, enum.Enum):
     IN_PROGRESS = "in_progress"
     COMPLETE = "complete"
     FAILED = "failed"
+    EXPIRED = "expired"
+
+
+class ClaimVerdict(str, enum.Enum):
+    CONFIRMED = "confirmed"
+    CONTRADICTED = "contradicted"
+    UNVERIFIABLE = "unverifiable"
+
+
+class ConfidenceLevel(str, enum.Enum):
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"

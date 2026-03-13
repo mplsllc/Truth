@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.db.base import Base
-from app.models import Article, Feed, StoryCluster  # noqa: F401 -- register models
+from app.models import Article, Claim, Feed, StoryCluster  # noqa: F401 -- register models
 
 
 # Use SQLite async for fast unit tests (no PostgreSQL required)

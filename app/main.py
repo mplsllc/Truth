@@ -10,6 +10,7 @@ from pathlib import Path
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select, func
 
 from app.config import get_settings
@@ -17,9 +18,11 @@ from app.db.session import async_session_factory
 from app.models.article import Article
 from app.models.feed import Feed
 from app.models.enums import TrustTier, FeedStatus
+from app.api.routes import router as web_router
 from app.tasks.scheduler import create_scheduler
 
 SEED_FILE = Path(__file__).parent.parent / "seed" / "feeds.json"
+STATIC_DIR = Path(__file__).parent.parent / "static"
 
 settings = get_settings()
 
@@ -139,6 +142,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.include_router(web_router)
 
 
 @app.get("/health")

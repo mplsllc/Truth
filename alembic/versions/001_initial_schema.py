@@ -42,13 +42,13 @@ def upgrade() -> None:
         sa.Column("composite_score", sa.Float(), nullable=True),
         sa.Column(
             "created_at",
-            sa.DateTime(),
+            sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.text("now()"),
         ),
         sa.Column(
             "updated_at",
-            sa.DateTime(),
+            sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.text("now()"),
         ),
@@ -89,7 +89,7 @@ def upgrade() -> None:
         sa.Column(
             "enabled", sa.Boolean(), nullable=False, server_default=sa.text("true")
         ),
-        sa.Column("last_polled_at", sa.DateTime(), nullable=True),
+        sa.Column("last_polled_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("last_error", sa.Text(), nullable=True),
         sa.Column(
             "error_count", sa.Integer(), nullable=False, server_default="0"
@@ -99,7 +99,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "created_at",
-            sa.DateTime(),
+            sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.text("now()"),
         ),
@@ -116,7 +116,7 @@ def upgrade() -> None:
         sa.Column("summary", sa.Text(), nullable=True),
         sa.Column("author", sa.String(512), nullable=True),
         sa.Column("image_url", sa.String(2048), nullable=True),
-        sa.Column("published_at", sa.DateTime(), nullable=True),
+        sa.Column("published_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("language", sa.String(10), nullable=True),
         sa.Column(
             "is_opinion", sa.Boolean(), nullable=False, server_default=sa.text("false")
@@ -148,7 +148,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "created_at",
-            sa.DateTime(),
+            sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.text("now()"),
         ),
