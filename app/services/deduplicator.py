@@ -233,12 +233,16 @@ async def find_or_create_cluster(
     embed_input = article.title + " " + (article.summary or "")[:500]
     embedding = embed_text(embed_input, embed_model)
 
+    # SQLite can't store list directly; serialize as JSON string
+    import json
+    bind = session.get_bind()
+    is_sqlite = bind.dialect.name == "sqlite" if hasattr(bind, "dialect") else False
+    embedding_value = json.dumps(embedding) if is_sqlite else embedding
+
     if cluster_id is None:
         # Create new cluster
-        import json
-
         cluster = StoryCluster(
-            embedding=json.dumps(embedding),  # Store as text for SQLite compat
+            embedding=embedding_value,
             status=ClusterStatus.ACTIVE,
             primary_article_id=article.id,
             article_count=1,

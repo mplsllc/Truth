@@ -19,6 +19,7 @@ from app.services.content_extractor import extract_content
 from app.services.deduplicator import deduplicate_article, find_or_create_cluster
 from app.services.feed_poller import ArticleCandidate, poll_all_feeds
 from app.services.http_client import RateLimitedClient
+from app.services.image_cache import cache_article_image
 
 logger = structlog.get_logger(__name__)
 
@@ -29,6 +30,10 @@ async def process_article(
     http_client: RateLimitedClient,
     embed_model: Any,
     similarity_threshold: float | None = None,
+    cf_account_id: str | None = None,
+    r2_bucket: str | None = None,
+    r2_api_token: str | None = None,
+    r2_public_url: str | None = None,
 ) -> Article | None:
     """Process a single article candidate through the full pipeline.
 
@@ -72,6 +77,9 @@ async def process_article(
                 article.is_opinion = extracted.is_opinion
                 article.is_wire_story = extracted.is_wire_story
                 article.wire_source = extracted.wire_source
+                # Use extracted og:image as fallback when RSS had no image
+                if not article.image_url and extracted.image_url:
+                    article.image_url = extracted.image_url
             else:
                 # Extraction failed -- use RSS summary as content
                 article.content = candidate.summary
@@ -106,6 +114,15 @@ async def process_article(
         await find_or_create_cluster(article, cluster_id, session, embed_model)
         await session.flush()
 
+        # Step 5: Cache image to R2
+        if article.image_url:
+            cached_url = await cache_article_image(
+                article.image_url, cf_account_id, r2_bucket, r2_api_token, r2_public_url
+            )
+            if cached_url and cached_url != article.image_url:
+                article.image_url = cached_url
+                await session.flush()
+
         await log.ainfo(
             "article_processed",
             article_id=article.id,
@@ -123,6 +140,10 @@ async def run_ingestion_cycle(
     http_client: RateLimitedClient,
     embed_model: Any,
     similarity_threshold: float | None = None,
+    cf_account_id: str | None = None,
+    r2_bucket: str | None = None,
+    r2_api_token: str | None = None,
+    r2_public_url: str | None = None,
 ) -> dict:
     """Run a full ingestion cycle: poll all feeds, process each article.
 
@@ -152,11 +173,17 @@ async def run_ingestion_cycle(
         await log.ainfo("ingestion_cycle_start", candidates=len(candidates))
 
         # Process each candidate sequentially (content extraction is rate-limited)
-        for candidate in candidates:
+        # Commit in batches of 50 so data is visible incrementally
+        batch_size = 50
+        for i, candidate in enumerate(candidates):
             try:
                 result = await process_article(
                     candidate, session, http_client, embed_model,
                     similarity_threshold=similarity_threshold,
+                    cf_account_id=cf_account_id,
+                    r2_bucket=r2_bucket,
+                    r2_api_token=r2_api_token,
+                    r2_public_url=r2_public_url,
                 )
                 if result is not None:
                     stats["articles_stored"] += 1
@@ -168,6 +195,14 @@ async def run_ingestion_cycle(
                     "candidate_processing_error",
                     url=candidate.url,
                     error=str(exc),
+                )
+
+            if (i + 1) % batch_size == 0:
+                await session.commit()
+                await log.ainfo(
+                    "ingestion_batch_committed",
+                    batch=((i + 1) // batch_size),
+                    articles_stored=stats["articles_stored"],
                 )
 
         await session.commit()

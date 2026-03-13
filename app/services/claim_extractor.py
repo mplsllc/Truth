@@ -5,7 +5,7 @@ from __future__ import annotations
 import structlog
 
 from app.schemas.fact_check import ClaimExtractionResult, ExtractedClaim
-from app.services.ollama_client import call_ollama_structured
+from app.services.llm_provider import call_llm_structured
 
 log = structlog.get_logger()
 
@@ -14,7 +14,7 @@ MAX_ARTICLE_WORDS = 3500
 EXTRACTION_SYSTEM_PROMPT = """\
 You are a fact-check analyst. Your job is to extract every verifiable claim from a news article.
 
-Extract ALL checkable claims including:
+Extract up to 8 of the most important verifiable claims, including:
 - Factual assertions (events, dates, numbers, names)
 - Attributions (who said what)
 - Statistics and data points
@@ -74,11 +74,15 @@ async def extract_claims(
     title: str,
     published_at: str,
     ollama_url: str,
+    groq_api_key: str | None = None,
+    gemini_api_key: str | None = None,
+    together_api_key: str | None = None,
+    openrouter_api_key: str | None = None,
 ) -> ClaimExtractionResult:
-    """Extract verifiable claims from article text via Ollama LLM.
+    """Extract verifiable claims from article text via LLM.
 
     Returns ClaimExtractionResult with validated claims and cluster summary.
-    Raises RuntimeError on Ollama failure, ValidationError on parse failure.
+    Raises RuntimeError on LLM failure, ValidationError on parse failure.
     """
     text, was_truncated = truncate_article(article_text)
 
@@ -103,10 +107,14 @@ async def extract_claims(
         {"role": "user", "content": user_message},
     ]
 
-    result = await call_ollama_structured(
+    result = await call_llm_structured(
         messages=messages,
         schema_class=ClaimExtractionResult,
         ollama_url=ollama_url,
+        groq_api_key=groq_api_key,
+        gemini_api_key=gemini_api_key,
+        together_api_key=together_api_key,
+        openrouter_api_key=openrouter_api_key,
     )
 
     parsed = ClaimExtractionResult.model_validate_json(result["content"])

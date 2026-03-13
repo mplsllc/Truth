@@ -45,6 +45,14 @@ services:
       OLLAMA_URL: http://ollama:11434
       HTTP_PROXY: ${HTTP_PROXY:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
+      R2_BUCKET: truth-images
+      R2_API_TOKEN: ${R2_API_TOKEN:-}
+      R2_PUBLIC_URL: ${R2_BUCKET_URL:-}
     depends_on:
       db:
         condition: service_healthy

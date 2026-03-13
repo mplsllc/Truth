@@ -68,6 +68,36 @@ class ExtractedContent:
     method: str = "trafilatura"
 
 
+def _clean_extracted_text(text: str) -> str:
+    """Remove navigation/sidebar junk that trafilatura sometimes includes.
+
+    Detects blocks of short lines that look like headline lists (e.g.
+    'Top Stories\\n6 dead after...\\n30 minutes ago...') and truncates
+    the article before them.
+    """
+    lines = text.split("\n")
+    # Look for a sequence of 5+ consecutive short lines (< 100 chars)
+    # that contain time markers like "ago" or date patterns — this signals
+    # a headline listing, not article content.
+    for i in range(len(lines) - 5):
+        short_run = 0
+        time_markers = 0
+        for j in range(i, min(i + 10, len(lines))):
+            line = lines[j].strip()
+            if len(line) < 100:
+                short_run += 1
+                if re.search(r"\d+\s*(minutes?|hours?|days?)\s*ago", line, re.IGNORECASE):
+                    time_markers += 1
+            else:
+                break
+        if short_run >= 5 and time_markers >= 2:
+            # Truncate before this listing block
+            cleaned = "\n".join(lines[:i]).strip()
+            if len(cleaned) >= MIN_CONTENT_LENGTH:
+                return cleaned
+    return text
+
+
 def detect_wire_story(text: str, url: str) -> tuple[bool, str | None]:
     """Detect if content is a wire service story (AP, Reuters).
 
@@ -141,6 +171,7 @@ def _parse_trafilatura_result(
     text = data.get("text", "")
     if not text or len(text) < MIN_CONTENT_LENGTH:
         return None
+    text = _clean_extracted_text(text)
 
     # Parse publication date if present
     published_at = None

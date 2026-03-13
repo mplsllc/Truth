@@ -183,7 +183,19 @@ async def homepage(
                 "score_class": score_class(primary.accuracy_score),
                 "score_color": score_color(primary.accuracy_score),
                 "claim_count": primary.claim_count,
+                "published_at": primary.published_at or primary.created_at,
+                "has_score": primary.accuracy_score is not None,
             })
+
+        # Boost recent rated stories to the top
+        def _sort_key(c):
+            age_hours = (datetime.now(timezone.utc) - c["published_at"]).total_seconds() / 3600
+            recency = max(0, 1 - age_hours / 72)  # decays over 3 days
+            rated_boost = 0.5 if c["has_score"] else 0
+            multi_source = min(0.3, c["article_count"] * 0.1)
+            return -(recency + rated_boost + multi_source)
+
+        clusters.sort(key=_sort_key)
 
     return templates.TemplateResponse("index.html", {
         "request": request,
@@ -246,6 +258,9 @@ async def story_detail(request: Request, cluster_id: int):
             "confirmed_count": confirmed,
             "contradicted_count": contradicted,
             "unverifiable_count": unverifiable,
+            "content": primary.content,
+            "summary": primary.summary,
+            "image_url": primary.image_url,
         }
 
         # Format claims for display

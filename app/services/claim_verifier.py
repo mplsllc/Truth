@@ -6,7 +6,7 @@ import structlog
 
 from app.schemas.fact_check import ClaimVerificationResult, ExtractedClaim
 from app.services.evidence_gatherer import EvidenceBundle
-from app.services.ollama_client import call_ollama_structured
+from app.services.llm_provider import call_llm_structured
 
 log = structlog.get_logger()
 
@@ -63,11 +63,15 @@ async def verify_claims(
     claims: list[ExtractedClaim],
     evidence: EvidenceBundle,
     ollama_url: str,
+    groq_api_key: str | None = None,
+    gemini_api_key: str | None = None,
+    together_api_key: str | None = None,
+    openrouter_api_key: str | None = None,
 ) -> ClaimVerificationResult:
-    """Verify all extracted claims against gathered evidence via Ollama LLM.
+    """Verify all extracted claims against gathered evidence via LLM.
 
     Returns ClaimVerificationResult with verdict, confidence, and reasoning for each claim.
-    Raises RuntimeError on Ollama failure, ValidationError on parse failure.
+    Raises RuntimeError on LLM failure, ValidationError on parse failure.
     """
     if not claims:
         return ClaimVerificationResult(verified_claims=[])
@@ -85,10 +89,14 @@ async def verify_claims(
         {"role": "user", "content": user_message},
     ]
 
-    result = await call_ollama_structured(
+    result = await call_llm_structured(
         messages=messages,
         schema_class=ClaimVerificationResult,
         ollama_url=ollama_url,
+        groq_api_key=groq_api_key,
+        gemini_api_key=gemini_api_key,
+        together_api_key=together_api_key,
+        openrouter_api_key=openrouter_api_key,
     )
 
     parsed = ClaimVerificationResult.model_validate_json(result["content"])

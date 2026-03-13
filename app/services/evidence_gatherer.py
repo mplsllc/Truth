@@ -51,11 +51,20 @@ async def get_cluster_evidence(
     if not cluster:
         return []
 
+    # Eagerly load cluster articles to avoid lazy-load in async context
+    from app.models.feed import Feed
+    result = await session.execute(
+        select(Article).where(
+            Article.cluster_id == article.cluster_id,
+            Article.id != article.id,
+            Article.content.isnot(None),
+        )
+    )
+    other_articles = result.scalars().all()
+
     items = []
-    for other in cluster.articles:
-        if other.id == article.id or not other.content:
-            continue
-        feed = other.feed
+    for other in other_articles:
+        feed = await session.get(Feed, other.feed_id)
         items.append(EvidenceItem(
             source_name=feed.name if feed else "Unknown",
             source_url=other.url,
@@ -167,22 +176,23 @@ async def gather_evidence(
 
     Returns at most MAX_EVIDENCE_ITEMS items, prioritizing cluster > semantic > external.
     """
-    cluster_items, semantic_items, external_items = await asyncio.gather(
-        get_cluster_evidence(article, session),
-        get_semantic_evidence(article, session, embed_model),
-        get_external_evidence(article, http_client),
-        return_exceptions=True,
-    )
-
-    # Graceful degradation — treat exceptions as empty results
-    if isinstance(cluster_items, BaseException):
-        await log.awarn("cluster_evidence_error", error=str(cluster_items))
+    # Run DB operations sequentially (shared session), external in parallel
+    try:
+        cluster_items = await get_cluster_evidence(article, session)
+    except Exception as e:
+        await log.awarn("cluster_evidence_error", error=str(e))
         cluster_items = []
-    if isinstance(semantic_items, BaseException):
-        await log.awarn("semantic_evidence_error", error=str(semantic_items))
+
+    try:
+        semantic_items = await get_semantic_evidence(article, session, embed_model)
+    except Exception as e:
+        await log.awarn("semantic_evidence_error", error=str(e))
         semantic_items = []
-    if isinstance(external_items, BaseException):
-        await log.awarn("external_evidence_error", error=str(external_items))
+
+    try:
+        external_items = await get_external_evidence(article, http_client)
+    except Exception as e:
+        await log.awarn("external_evidence_error", error=str(e))
         external_items = []
 
     # Combine with priority: cluster > semantic > external

@@ -42,8 +42,21 @@ class Settings(BaseSettings):
 
     # Fact-checking
     fact_check_interval_seconds: int = 30
+    fact_check_batch_size: int = 3
     fact_check_article_max_age_hours: int = 24
     ollama_model: str = "llama3.1:8b"
+
+    # LLM provider API keys (cloud providers tried before local Ollama)
+    groq_api_key: Optional[str] = None
+    gemini_api_key: Optional[str] = None
+    together_api_key: Optional[str] = None
+    openrouter_api_key: Optional[str] = None
+
+    # Cloudflare R2 image cache
+    cloudflare_account_id: Optional[str] = None
+    r2_bucket: str = "truth-images"
+    r2_api_token: Optional[str] = None
+    r2_public_url: Optional[str] = None
 
     # Logging
     log_level: str = "INFO"

@@ -148,11 +148,13 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0;
+    max-height: 280px;
+    overflow: hidden;
 }
 
 .story-card.hero .card-image {
-    height: 100%;
-    min-height: 320px;
+    height: 280px;
+    object-fit: cover;
     border-radius: 12px 0 0 12px;
 }
 
@@ -336,13 +338,13 @@ body {
 
 /* Detail page */
 .detail-container {
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 2rem 1.5rem;
 }
 
 .detail-header {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .detail-title {
@@ -355,53 +357,83 @@ body {
 .detail-meta {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     color: var(--text-muted);
     font-size: 0.85rem;
-    margin-bottom: 1rem;
 }
 
-.detail-score-card {
+.detail-body {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.detail-main {
+    min-width: 0;
+}
+
+.detail-sidebar {
+    position: sticky;
+    top: 5rem;
+}
+
+.sidebar-score-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 2rem;
+    border-radius: 10px;
+    padding: 1rem;
 }
 
-.detail-score-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
-
-.detail-score-value {
-    font-size: 2.5rem;
+.sidebar-score-value {
+    font-size: 2rem;
     font-weight: 800;
+    line-height: 1;
 }
 
-.detail-sub-scores {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+.sidebar-stats {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
-.detail-sub-score {
-    text-align: center;
+.sidebar-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
 }
 
-.detail-sub-score-label {
-    font-size: 0.7rem;
+.sidebar-stat-val {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.sidebar-stat-lbl {
+    font-size: 0.6rem;
     text-transform: uppercase;
     color: var(--text-dim);
-    letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
+    letter-spacing: 0.3px;
 }
 
-.detail-sub-score-value {
-    font-size: 1.25rem;
-    font-weight: 700;
+.sidebar-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .detail-body {
+        grid-template-columns: 1fr;
+    }
+    .detail-sidebar {
+        position: static;
+        order: -1;
+    }
 }
 
 /* Claims section */

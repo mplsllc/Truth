@@ -46,13 +46,14 @@ async def age_out_pending(
     return count
 
 
-async def pick_next_article(session: AsyncSession) -> Article | None:
-    """Pick the next PENDING article for fact-checking, prioritized by trust tier.
+async def pick_next_articles(session: AsyncSession, batch_size: int = 5) -> list[Article]:
+    """Pick the next batch of PENDING articles for fact-checking, prioritized by trust tier.
 
     Uses FOR UPDATE SKIP LOCKED on PostgreSQL for safe concurrent access.
     Falls back to simple select on SQLite.
     """
-    # Try PostgreSQL FOR UPDATE SKIP LOCKED first
+    # Only fact-check news articles (general, politics) — skip science, tech, sports, etc.
+    FACT_CHECK_CATEGORIES = ('general', 'politics')
     try:
         result = await session.execute(
             text("""
@@ -60,6 +61,7 @@ async def pick_next_article(session: AsyncSession) -> Article | None:
                 JOIN feeds f ON a.feed_id = f.id
                 WHERE a.fact_check_status = :status
                   AND a.content IS NOT NULL
+                  AND f.category IN ('general', 'politics')
                 ORDER BY
                     CASE f.trust_tier
                         WHEN 'high' THEN 1
@@ -67,36 +69,37 @@ async def pick_next_article(session: AsyncSession) -> Article | None:
                         WHEN 'low' THEN 3
                         ELSE 4
                     END,
-                    a.created_at ASC
-                LIMIT 1
+                    a.created_at DESC
+                LIMIT :batch_size
                 FOR UPDATE SKIP LOCKED
             """),
-            {"status": FactCheckStatus.PENDING.value},
+            {"status": FactCheckStatus.PENDING.value, "batch_size": batch_size},
         )
-        row = result.fetchone()
+        rows = result.fetchall()
     except Exception:
-        # SQLite fallback
         result = await session.execute(
             select(Article.id)
             .join(Feed, Article.feed_id == Feed.id)
             .where(
                 Article.fact_check_status == FactCheckStatus.PENDING,
                 Article.content.isnot(None),
+                Feed.category.in_(FACT_CHECK_CATEGORIES),
             )
-            .order_by(Article.created_at.asc())
-            .limit(1)
+            .order_by(Article.created_at.desc())
+            .limit(batch_size)
         )
-        row = result.fetchone()
+        rows = result.fetchall()
 
-    if row is None:
-        return None
-
-    article = await session.get(Article, row[0])
-    if article:
-        article.fact_check_status = FactCheckStatus.IN_PROGRESS
+    articles = []
+    for row in rows:
+        article = await session.get(Article, row[0])
+        if article:
+            article.fact_check_status = FactCheckStatus.IN_PROGRESS
+            articles.append(article)
+    if articles:
         await session.flush()
 
-    return article
+    return articles
 
 
 async def process_article(
@@ -105,6 +108,10 @@ async def process_article(
     http_client,
     embed_model: Any,
     ollama_url: str,
+    groq_api_key: str | None = None,
+    gemini_api_key: str | None = None,
+    together_api_key: str | None = None,
+    openrouter_api_key: str | None = None,
 ) -> bool:
     """Run the full fact-check pipeline on a single article.
 
@@ -134,6 +141,10 @@ async def process_article(
             title=article.title,
             published_at=str(article.published_at or ""),
             ollama_url=ollama_url,
+            groq_api_key=groq_api_key,
+            gemini_api_key=gemini_api_key,
+            together_api_key=together_api_key,
+            openrouter_api_key=openrouter_api_key,
         )
 
         # Update cluster title/summary if this article's cluster exists
@@ -152,6 +163,10 @@ async def process_article(
             claims=extraction.claims,
             evidence=evidence,
             ollama_url=ollama_url,
+            groq_api_key=groq_api_key,
+            gemini_api_key=gemini_api_key,
+            together_api_key=together_api_key,
+            openrouter_api_key=openrouter_api_key,
         )
 
         # Calculate accuracy score
@@ -211,17 +226,39 @@ async def run_fact_check_cycle(
     embed_model: Any,
     ollama_url: str,
     max_age_hours: int = 24,
+    batch_size: int = 5,
+    groq_api_key: str | None = None,
+    gemini_api_key: str | None = None,
+    together_api_key: str | None = None,
+    openrouter_api_key: str | None = None,
 ) -> dict:
-    """Run one fact-check cycle: age out old articles, process next article.
+    """Run one fact-check cycle: age out old articles, process a batch.
 
-    Returns stats dict with keys: aged_out, processed, success.
+    Returns stats dict with keys: aged_out, processed, succeeded, failed.
     """
+    import asyncio
+
     aged_out = await age_out_pending(session, max_age_hours)
 
-    article = await pick_next_article(session)
-    if article is None:
-        return {"aged_out": aged_out, "processed": False, "success": False}
+    articles = await pick_next_articles(session, batch_size=batch_size)
+    if not articles:
+        return {"aged_out": aged_out, "processed": 0, "succeeded": 0, "failed": 0}
 
-    success = await process_article(article, session, http_client, embed_model, ollama_url)
+    # Process articles sequentially (shared session), but each article's
+    # LLM calls already use async HTTP so we get good throughput.
+    succeeded = 0
+    failed = 0
+    for article in articles:
+        success = await process_article(
+            article, session, http_client, embed_model, ollama_url,
+            groq_api_key=groq_api_key,
+            gemini_api_key=gemini_api_key,
+            together_api_key=together_api_key,
+            openrouter_api_key=openrouter_api_key,
+        )
+        if success:
+            succeeded += 1
+        else:
+            failed += 1
 
-    return {"aged_out": aged_out, "processed": True, "success": success}
+    return {"aged_out": aged_out, "processed": len(articles), "succeeded": succeeded, "failed": failed}

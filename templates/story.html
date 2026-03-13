@@ -12,62 +12,75 @@
             <span>{{ primary.time_ago }}</span>
             {% if cluster.article_count > 1 %}
             <span>&middot;</span>
-            <span>{{ cluster.article_count }} sources covering this story</span>
+            <span>{{ cluster.article_count }} sources</span>
             {% endif %}
         </div>
-        <div class="card-badges">
+    </div>
+
+    <div class="detail-body">
+        <div class="detail-main">
+            {% if primary.image_url %}
+            <div style="margin-bottom: 1.5rem;">
+                <img src="{{ primary.image_url }}" alt="" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px;">
+            </div>
+            {% endif %}
+
+            {% if cluster.summary %}
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+                <div style="font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; margin-bottom: 0.4rem;">AI Summary</div>
+                <p style="font-size: 0.95rem; line-height: 1.6; margin: 0;">{{ cluster.summary }}</p>
+            </div>
+            {% endif %}
+
+            {% if primary.content %}
+            <div class="article-content" style="font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; color: var(--text);">
+                {% for paragraph in primary.content.split('\n') %}
+                    {% if paragraph.strip() %}
+                    <p style="margin-bottom: 1rem;">{{ paragraph.strip() }}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% elif primary.summary %}
+            <div class="article-content" style="font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; color: var(--text);">
+                <p>{{ primary.summary }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <aside class="detail-sidebar">
             {% if primary.score is not none %}
-            <span class="badge badge-score badge-{{ primary.score_class }}">{{ primary.score_label }} ({{ (primary.score * 100)|int }}%)</span>
+            <div class="sidebar-score-card">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="sidebar-score-value" style="color: {{ primary.score_color }};">{{ (primary.score * 100)|int }}%</div>
+                    <span class="badge badge-score badge-{{ primary.score_class }}">{{ primary.score_label }}</span>
+                </div>
+                <div class="sidebar-stats">
+                    <div class="sidebar-stat">
+                        <span class="sidebar-stat-val" style="color: var(--green);">{{ primary.confirmed_count }}</span>
+                        <span class="sidebar-stat-lbl">confirmed</span>
+                    </div>
+                    <div class="sidebar-stat">
+                        <span class="sidebar-stat-val" style="color: var(--red);">{{ primary.contradicted_count }}</span>
+                        <span class="sidebar-stat-lbl">contradicted</span>
+                    </div>
+                    <div class="sidebar-stat">
+                        <span class="sidebar-stat-val" style="color: var(--text-dim);">{{ primary.unverifiable_count }}</span>
+                        <span class="sidebar-stat-lbl">unverifiable</span>
+                    </div>
+                </div>
+                <div class="sidebar-meta">
+                    <span>{{ primary.claim_count }} claims checked</span>
+                    <span>{{ primary.trust_tier|upper }} tier source</span>
+                    <span>{{ cluster.article_count }} source{{ 's' if cluster.article_count != 1 }}</span>
+                </div>
+            </div>
             {% else %}
-            <span class="badge badge-score badge-pending">Pending fact-check</span>
+            <div class="sidebar-score-card">
+                <span class="badge badge-score badge-pending">Pending fact-check</span>
+            </div>
             {% endif %}
-        </div>
+        </aside>
     </div>
-
-    {% if primary.score is not none %}
-    <div class="detail-score-card">
-        <div class="detail-score-header">
-            <div>
-                <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Accuracy Score</div>
-                <div class="detail-score-value" style="color: {{ primary.score_color }};">{{ (primary.score * 100)|int }}%</div>
-            </div>
-            <span class="badge badge-score badge-{{ primary.score_class }}" style="font-size: 0.85rem; padding: 0.35rem 1rem;">{{ primary.score_label }}</span>
-        </div>
-        <div class="detail-sub-scores">
-            <div class="detail-sub-score">
-                <div class="detail-sub-score-label">Claims Checked</div>
-                <div class="detail-sub-score-value">{{ primary.claim_count }}</div>
-            </div>
-            <div class="detail-sub-score">
-                <div class="detail-sub-score-label">Confirmed</div>
-                <div class="detail-sub-score-value" style="color: var(--green);">{{ primary.confirmed_count }}</div>
-            </div>
-            <div class="detail-sub-score">
-                <div class="detail-sub-score-label">Contradicted</div>
-                <div class="detail-sub-score-value" style="color: var(--red);">{{ primary.contradicted_count }}</div>
-            </div>
-            <div class="detail-sub-score">
-                <div class="detail-sub-score-label">Unverifiable</div>
-                <div class="detail-sub-score-value" style="color: var(--text-dim);">{{ primary.unverifiable_count }}</div>
-            </div>
-            <div class="detail-sub-score">
-                <div class="detail-sub-score-label">Source Tier</div>
-                <div class="detail-sub-score-value">{{ primary.trust_tier|upper }}</div>
-            </div>
-            <div class="detail-sub-score">
-                <div class="detail-sub-score-label">Coverage</div>
-                <div class="detail-sub-score-value">{{ cluster.article_count }} sources</div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    {% if cluster.summary %}
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem;">
-        <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; margin-bottom: 0.5rem;">AI Summary</div>
-        <p style="font-size: 0.95rem; line-height: 1.6;">{{ cluster.summary }}</p>
-    </div>
-    {% endif %}
 
     {% if claims %}
     <div class="claims-section">

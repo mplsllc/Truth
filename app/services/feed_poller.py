@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import re
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from time import mktime
 from typing import Optional
 from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
@@ -194,13 +195,20 @@ async def poll_single_feed(
             if existing.scalar_one_or_none() is not None:
                 continue
 
+            # Skip entries older than 7 days to avoid ingesting archives
+            published_at = _parse_published(entry)
+            if published_at:
+                age = datetime.now(timezone.utc) - published_at
+                if age > timedelta(days=7):
+                    continue
+
             # Extract metadata
             title = getattr(entry, "title", "Untitled")
-            summary = getattr(entry, "summary", None) or getattr(
+            summary_raw = getattr(entry, "summary", None) or getattr(
                 entry, "description", None
             )
+            summary = re.sub(r"<[^>]+>", "", summary_raw).strip() if summary_raw else None
             author = getattr(entry, "author", None) or entry.get("dc_creator")
-            published_at = _parse_published(entry)
             image_url = _extract_image_url(entry)
 
             candidates.append(
@@ -269,30 +277,26 @@ async def poll_all_feeds(
 
     await log.ainfo("poll_all_feeds_start", feed_count=len(feeds))
 
-    # Poll all feeds concurrently with error isolation
-    results = await asyncio.gather(
-        *[poll_single_feed(f, session, http_client) for f in feeds],
-        return_exceptions=True,
-    )
-
+    # Poll feeds sequentially -- they share a single async session which
+    # does not support concurrent flushes.
     all_candidates: list[ArticleCandidate] = []
     error_count = 0
 
-    for feed, result in zip(feeds, results):
-        if isinstance(result, Exception):
+    for feed in feeds:
+        try:
+            candidates = await poll_single_feed(feed, session, http_client)
+            all_candidates.extend(candidates)
+        except Exception as exc:
             error_count += 1
             await log.aerror(
-                "feed_gather_error",
+                "feed_poll_error",
                 feed_id=feed.id,
                 feed_name=feed.name,
-                error=str(result),
+                error=str(exc),
             )
-            # Update feed health for unexpected exceptions
             feed.status = FeedStatus.ERROR
             feed.error_count = (feed.error_count or 0) + 1
-            feed.last_error = str(result)
-        elif isinstance(result, list):
-            all_candidates.extend(result)
+            feed.last_error = str(exc)
 
     await session.flush()
 

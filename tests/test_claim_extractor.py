@@ -76,7 +76,7 @@ MOCK_LLM_RESPONSE = json.dumps({
 async def test_valid_extraction():
     """Successfully extracts claims from article text."""
     with patch(
-        "app.services.claim_extractor.call_ollama_structured",
+        "app.services.claim_extractor.call_llm_structured",
         new_callable=AsyncMock,
         return_value={"content": MOCK_LLM_RESPONSE, "eval_count": 100, "total_duration": 5000},
     ):
@@ -99,7 +99,7 @@ async def test_valid_extraction():
 async def test_ollama_error_propagates():
     """RuntimeError from Ollama client propagates to caller."""
     with patch(
-        "app.services.claim_extractor.call_ollama_structured",
+        "app.services.claim_extractor.call_llm_structured",
         new_callable=AsyncMock,
         side_effect=RuntimeError("Ollama down"),
     ):

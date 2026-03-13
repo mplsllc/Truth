@@ -74,7 +74,7 @@ async def test_verify_claims_success():
     )
 
     with patch(
-        "app.services.claim_verifier.call_ollama_structured",
+        "app.services.claim_verifier.call_llm_structured",
         new_callable=AsyncMock,
         return_value={"content": MOCK_VERIFICATION_RESPONSE, "eval_count": 50},
     ):

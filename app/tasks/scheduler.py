@@ -38,7 +38,11 @@ async def _run_ingestion_pipeline(embed_model=None) -> None:
         async with client:
             try:
                 stats = await run_ingestion_cycle(
-                    session, client, embed_model
+                    session, client, embed_model,
+                    cf_account_id=settings.cloudflare_account_id,
+                    r2_bucket=settings.r2_bucket,
+                    r2_api_token=settings.r2_api_token,
+                    r2_public_url=settings.r2_public_url,
                 )
 
                 await log.ainfo(
@@ -76,11 +80,16 @@ async def _run_fact_check_pipeline(embed_model=None) -> None:
                     embed_model=embed_model,
                     ollama_url=settings.ollama_url,
                     max_age_hours=settings.fact_check_article_max_age_hours,
+                    batch_size=settings.fact_check_batch_size,
+                    groq_api_key=settings.groq_api_key,
+                    gemini_api_key=settings.gemini_api_key,
+                    together_api_key=settings.together_api_key,
+                    openrouter_api_key=settings.openrouter_api_key,
                 )
 
                 await session.commit()
 
-                if stats["processed"]:
+                if stats["processed"] > 0:
                     await log.ainfo(
                         "fact_check_cycle_complete",
                         timestamp=datetime.now(timezone.utc).isoformat(),
