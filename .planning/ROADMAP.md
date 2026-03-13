@@ -13,9 +13,9 @@ Truth delivers a fact-checked news aggregator in four phases following a strict 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation and Ingestion** - Project skeleton, database, Docker services, RSS polling, article extraction, and deduplication
-- [ ] **Phase 2: Fact-Check Pipeline** - Ollama LLM integration for claim extraction, cross-reference verification, and async processing
-- [ ] **Phase 3: Scoring and Core Display** - Composite credibility scoring, magazine-style UI with badges, fact-check detail views
-- [ ] **Phase 4: Navigation and Discovery** - Category filtering, keyword search, and temporal browsing
+- [x] **Phase 2: Fact-Check Pipeline** - Ollama LLM integration for claim extraction, cross-reference verification, and async processing
+- [x] **Phase 3: Scoring and Core Display** - Composite credibility scoring, magazine-style UI with badges, fact-check detail views
+- [x] **Phase 4: Navigation and Discovery** - Category filtering, keyword search, and temporal browsing
 
 ## Phase Details
 
@@ -47,11 +47,12 @@ Plans:
   3. Each article receives an accuracy score based on how many claims were corroborated, contradicted, or unverifiable
   4. The full reasoning chain is stored for each fact-check (which claims, which sources, what verdict)
   5. Articles display immediately with a "pending" badge while awaiting fact-check, and the pipeline handles backpressure without unbounded queue growth
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- Claim model, Pydantic schemas, Ollama client, claim extraction (Pass 1)
+- [ ] 02-02-PLAN.md -- Evidence gathering (3-tier), claim verification (Pass 2), accuracy scoring
+- [ ] 02-03-PLAN.md -- Fact-check orchestrator, database queue, scheduler wiring, Alembic migration
 
 ### Phase 3: Scoring and Core Display
 **Goal**: Users can browse a magazine-style news site where every story carries a transparent, multi-axis credibility score
@@ -90,6 +91,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation and Ingestion | 4/4 | Complete | 2026-03-12 |
-| 2. Fact-Check Pipeline | 0/? | Not started | - |
-| 3. Scoring and Core Display | 0/? | Not started | - |
-| 4. Navigation and Discovery | 0/? | Not started | - |
+| 2. Fact-Check Pipeline | 3/3 | Complete | 2026-03-13 |
+| 3. Scoring and Core Display | 1/1 | Complete | 2026-03-13 |
+| 4. Navigation and Discovery | 1/1 | Complete | 2026-03-13 |
